@@ -1,0 +1,25 @@
+name: Publish Docker Image to GHCR
+
+on:
+  push:
+    branches: [main]  # ou "master", selon ton repo
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build . -t ghcr.io/${{ github.repository }}:latest
+
+      - name: Push Docker image
+        run: docker push ghcr.io/${{ github.repository }}:latest
